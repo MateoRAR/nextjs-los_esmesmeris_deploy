@@ -1,12 +1,13 @@
 "use client"
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-
+import { useUserStore } from '@/store/userInfoStore'
 const navigation = [
-  { name: 'Users', href: '/users', current: false },
-  { name: 'Nada_De_momento 0', href: '#', current: false },
-  { name: 'Nada_De_Momento 1 ', href: '#', current: false },
-  { name: 'Nada_De_Momento 2', href: '#', current: false },
+  { name: 'Home', href: '/home', current: false, roles: ['admin', 'employee'] },
+  { name: 'Users', href: '/users', current: false, roles: ['admin']  },
+  { name: 'Nada_De_momento 0', href: '#', current: false, roles: ['admin', 'employee'] },
+  { name: 'Nada_De_Momento 1 ', href: '#', current: false, roles: ['admin', 'employee'] },
+  { name: 'Log out', href: '/login', current: false, roles: ['admin', 'employee'] }
 ]
 
 function classNames(...classes) {
@@ -14,6 +15,7 @@ function classNames(...classes) {
 }
 
 export default function NavBarGeneral() {
+  const { role } = useUserStore();
   return (
     <Disclosure
       as="nav"
@@ -40,8 +42,8 @@ export default function NavBarGeneral() {
             </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
-                {navigation.map((item) => (
-                  <a
+                {navigation.map((item) => 
+                item.roles.includes(role) &&(<a
                     key={item.name}
                     href={item.href}
                     aria-current={item.current ? 'page' : undefined}
@@ -53,8 +55,9 @@ export default function NavBarGeneral() {
                     )}
                   >
                     {item.name}
-                  </a>
-                ))}
+                  </a>)
+
+                )}
               </div>
             </div>
           </div>

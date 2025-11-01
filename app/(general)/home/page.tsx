@@ -2,7 +2,7 @@
 import { useUserStore } from '@/store/userInfoStore';
 
 export default function Home() {
-  const {id,role,name,isAuthenticated} = useUserStore(); // suscríbete a todo el store
+  const {id,role,name,isAuthenticated} = useUserStore(); 
 
   
 

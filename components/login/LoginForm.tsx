@@ -31,7 +31,6 @@ export default function LoginForm() {
       setId(state.user.id)
       setName(state.user.name)
       setIsAuthenticated(true)
-      console.log(useUserStore.getState().role);
       router.push('/home')
       
     }

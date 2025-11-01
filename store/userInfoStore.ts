@@ -13,7 +13,7 @@ export type UserStore = {
   setId: (id: string) => void
   setIsAuthenticated: (v: boolean) => void
   setName: (name: string) => void
-  logout: () => void
+  clean: () => void
 }
 
 export const useUserStore = create<UserStore>()(
@@ -29,7 +29,7 @@ export const useUserStore = create<UserStore>()(
       setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
       setName: (name) => set({ name }),
 
-      logout: () =>
+      clean: () =>
         set({
           role: '',
           id: '',

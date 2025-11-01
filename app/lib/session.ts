@@ -20,3 +20,8 @@ export async function createSession(token:any) {
   })
 
 }
+
+export async function deleteSession() {
+  const cookieStore = await cookies()
+  cookieStore.delete('session')
+}

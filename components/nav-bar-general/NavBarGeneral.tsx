@@ -2,12 +2,12 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useUserStore } from '@/store/userInfoStore'
+import { logout } from '@/app/actions/auth/auth'
 const navigation = [
   { name: 'Home', href: '/home', current: false, roles: ['admin', 'employee'] },
   { name: 'Users', href: '/users', current: false, roles: ['admin']  },
   { name: 'Nada_De_momento 0', href: '#', current: false, roles: ['admin', 'employee'] },
-  { name: 'Nada_De_Momento 1 ', href: '#', current: false, roles: ['admin', 'employee'] },
-  { name: 'Log out', href: '/login', current: false, roles: ['admin', 'employee'] }
+  { name: 'Nada_De_Momento 1 ', href: '#', current: false, roles: ['admin', 'employee'] }
 ]
 
 function classNames(...classes) {
@@ -15,7 +15,11 @@ function classNames(...classes) {
 }
 
 export default function NavBarGeneral() {
-  const { role } = useUserStore();
+  const { role, clean} = useUserStore();
+  function handleLogout(){
+    clean();
+    logout();
+  }
   return (
     <Disclosure
       as="nav"
@@ -58,6 +62,8 @@ export default function NavBarGeneral() {
                   </a>)
 
                 )}
+
+
               </div>
             </div>
           </div>
@@ -107,6 +113,7 @@ export default function NavBarGeneral() {
                   <a
                     href="#"
                     className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden dark:text-gray-300 dark:data-focus:bg-white/5"
+                    onClick={handleLogout}
                   >
                     Sign out
                   </a>

@@ -14,14 +14,29 @@ export async function signIn(prevState:any,formData: FormData) {
                                    "Content-Type": "application/json",
                                  }
   });
-
   const body =await response.json();
   if (!body.success) {
-    return { message: 'Invalid credentialsss' }
+    return {
+      success: false,
+      message: 'Invalid Credentials',
+      user:{
+        id: "",
+        role: "",
+        name:""
+      }
+    }
   }
   const token= body.token;
   await createSession(token);
-  redirect('/home');
-
-
+  //Datos para crear la sesion.
+  console.log(body);
+  return {
+    success: true,
+    message: '',
+    user: {
+      id: body.user.id,
+      role: body.user.role,
+      name:body.user.name
+    }
+  }
 }

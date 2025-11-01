@@ -1,16 +1,46 @@
 "use client"
 import { signIn } from '@/app/actions/auth/auth'
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import ErrorAlert from '@/components/error-alert/ErrorAlert';
+import { useUserStore, UserStore } from '@/store/userInfoStore';
 
 
 const initialState = {
   message: '',
+  success: false,
+  user: {
+    id: "",
+    role: "",
+    name: ""
+  }
 }
 
 export default function LoginForm() {
-  //Use action state to handle errors.
+  const router = useRouter()
   const [state, formAction, pending] = useActionState(signIn, initialState);
+
+
+  const { setRole, setId, setName, setIsAuthenticated } = useUserStore();
+  
+  useEffect(() => {// setea el estado 
+
+
+    if (state?.success && state.user) {
+      setRole(state.user.role)
+      setId(state.user.id)
+      setName(state.user.name)
+      setIsAuthenticated(true)
+      console.log(useUserStore.getState().role);
+      router.push('/home')
+      
+    }
+    
+
+
+  }, [state, router,state,  setRole, setId, setName, setIsAuthenticated,useUserStore])
+
+
   return (
     <>
       {/*
@@ -30,7 +60,7 @@ export default function LoginForm() {
           />
           <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">Sign in to your account</h2>
         </div>
-              {state?.message && (<ErrorAlert message={state.message}/>) }
+        {state?.message && (<ErrorAlert message={state.message} />)}
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form action={formAction}>

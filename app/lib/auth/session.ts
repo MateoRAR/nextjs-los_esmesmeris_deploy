@@ -30,7 +30,6 @@ export async function decryptSession() {
   const cookieStore = await cookies()
   const token = cookieStore.get('session')?.value
   if (!token) return null
-
   try {
     const payloadBase64 = token.split('.')[1]
     const decodedPayload = JSON.parse(atob(payloadBase64))
@@ -38,5 +37,11 @@ export async function decryptSession() {
   } catch {
     return null
   }
+}
+export async function getToken(){
+  const cookieStore = await cookies()
+  const token = cookieStore.get('session')?.value
+  if (!token) return ""
+  return token
 }
 

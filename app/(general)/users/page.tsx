@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import { getUsers } from "@/app/actions/users/users";
+import UserCard from "@/components/users/userCard"
 export default function Home() {
   const [users, setUsers] = useState();
 
@@ -15,7 +16,7 @@ export default function Home() {
 
   return (
     <div>
-     
+     <UserCard/>
       Usuarios
     </div>
   );

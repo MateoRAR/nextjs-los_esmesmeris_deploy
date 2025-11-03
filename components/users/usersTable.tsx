@@ -1,20 +1,17 @@
 import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
-
+import {useState,useEffect} from "react"
 export default function Component({users}) {
   // si users existe  entonces entonces accede a lo primero sino, array vacio
-  const   keys=Object.keys(users?.[0] ?? []);
-
-  const ignore=["createdAt","updatedAt"];
-  keys.filter((key)=>{!ignore.includes(key)});
-  console.log(keys);
-  console.log(users);
+  const ignore=new Set(["createdAt","updatedAt"]);
   
+  const keys= users[0] ? Object.keys(users[0]).filter((user)=>!ignore.has(user)) :[];  
   return (
     <div className="overflow-x-auto">
       <Table hoverable>
         <TableHead>
         <TableRow>
         {keys.map((key) => (
+            
             <TableHeadCell key={key}>{key}</TableHeadCell>
         ))} 
             <TableHeadCell>

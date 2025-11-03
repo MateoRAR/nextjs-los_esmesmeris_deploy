@@ -11,8 +11,10 @@ export async function getUsers() {
         },
 
     })
-    const json = ans.json();
-
+    const json = await ans.json();
+    //form json to array
     return json;
+
+
 
 }

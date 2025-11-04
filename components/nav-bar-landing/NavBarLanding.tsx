@@ -9,7 +9,7 @@ const navigation = [
   { name: 'Nada_De_Momento 2', href: '#', current: false },
 ]
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 

@@ -1,31 +1,30 @@
 "use client";
 
-import { Supplier } from "@/app/types/supplier";
-import { deleteSupplier } from "@/app/actions/suppliers";
+import { Disposal } from "@/app/types/disposal";
+import { deleteDisposal } from "@/app/actions/disposals";
 import Link from "next/link";
 import { useTransition } from "react";
 
-export default function SupplierTable({ suppliers }: { suppliers: Supplier[] }) {
+export default function DisposalTable({ disposals }: { disposals: Disposal[] }) {
   const [isPending, startTransition] = useTransition();
 
   const handleDelete = (id: string) => {
-    if (confirm("¿Eliminar este proveedor?")) {
-      startTransition(() => deleteSupplier(id));
+    if (confirm("¿Eliminar esta disposición?")) {
+      startTransition(() => deleteDisposal(id));
     }
   };
 
-  // 🔹 Si no hay proveedores, muestra mensaje vacío
-  if (!suppliers || suppliers.length === 0) {
+  // Vacío
+  if (!disposals || disposals.length === 0) {
     return (
       <div className="text-center text-gray-500 py-6 bg-white shadow-md rounded-xl">
-        No hay proveedores registrados.
+        No hay disposiciones registradas.
       </div>
     );
   }
 
-  // 🔹 Tomamos dinámicamente las claves del primer supplier
-  // (exceptuando las que no queremos mostrar)
-  const columns = Object.keys(suppliers[0]).filter(
+  // Columnas dinámicas del primer elemento
+  const columns = Object.keys(disposals[0]).filter(
     (key) => !["id", "createdAt", "updatedAt"].includes(key)
   );
 
@@ -44,22 +43,22 @@ export default function SupplierTable({ suppliers }: { suppliers: Supplier[] }) 
         </thead>
 
         <tbody>
-          {suppliers.map((supplier) => (
-            <tr key={supplier.id} className="border-b hover:bg-gray-50">
+          {disposals.map((item) => (
+            <tr key={item.id} className="border-b hover:bg-gray-50">
               {columns.map((key) => (
                 <td key={key} className="px-6 py-4">
-                  {String((supplier as any)[key] ?? "")}
+                  {String((item as any)[key] ?? "")}
                 </td>
               ))}
               <td className="px-6 py-4 text-right">
                 <Link
-                  href={`/suppliers/${supplier.id}`}
+                  href={`/disposals/${item.id}`}
                   className="text-blue-600 hover:underline mr-3"
                 >
                   Editar
                 </Link>
                 <button
-                  onClick={() => handleDelete(supplier.id)}
+                  onClick={() => handleDelete(item.id)}
                   disabled={isPending}
                   className="text-red-600 hover:underline disabled:opacity-50"
                 >
@@ -73,4 +72,5 @@ export default function SupplierTable({ suppliers }: { suppliers: Supplier[] }) 
     </div>
   );
 }
+
 

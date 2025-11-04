@@ -1,20 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createSupplier, updateSupplier } from "@/app/actions/suppliers";
-import { Supplier } from "@/app/types/supplier";
+import { Supplier, supplierFields } from "@/app/types/supplier";
 
 export default function SupplierForm({ supplier }: { supplier?: Supplier }) {
   const router = useRouter();
-  const [form, setForm] = useState({
-    name: supplier?.name || "",
-    contact: supplier?.contact || "",
-    phone: supplier?.phone || "",
+
+  const [form, setForm] = useState<Omit<Supplier, "id">>(() => {
+    if (supplier) {
+      const { id, ...rest } = supplier;
+      return rest;
+    }
+    return { ...supplierFields };
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  useEffect(() => {
+    if (supplier) {
+      const { id, ...rest } = supplier;
+      setForm(rest);
+    }
+  }, [supplier]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "number" ? Number(value) : value,
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,30 +46,22 @@ export default function SupplierForm({ supplier }: { supplier?: Supplier }) {
       <h2 className="text-lg font-semibold text-gray-700">
         {supplier ? "Editar proveedor" : "Nuevo proveedor"}
       </h2>
-      <input
-        name="name"
-        placeholder="Nombre"
-        value={form.name}
-        onChange={handleChange}
-        required
-        className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-200"
-      />
-      <input
-        name="contact"
-        placeholder="Contacto"
-        value={form.contact}
-        onChange={handleChange}
-        required
-        className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-200"
-      />
-      <input
-        name="phone"
-        placeholder="Teléfono"
-        value={form.phone}
-        onChange={handleChange}
-        required
-        className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-200"
-      />
+
+      {Object.entries(form).map(([key, value]) => (
+        <div key={key}>
+          <label className="block text-sm font-medium text-gray-600 capitalize">
+            {key}
+          </label>
+          <input
+            name={key}
+            value={String(value)}
+            onChange={handleChange}
+            required
+            className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-200"
+          />
+        </div>
+      ))}
+
       <button
         type="submit"
         className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"

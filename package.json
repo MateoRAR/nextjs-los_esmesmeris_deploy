@@ -13,14 +13,17 @@
   "dependencies": {
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
+    "@types/mapbox-gl": "^3.4.1",
     "cookie": "^1.0.2",
     "cors": "^2.8.5",
     "flowbite-react": "^0.12.10",
     "jose": "^6.1.0",
+    "mapbox-gl": "^3.16.0",
     "next": "16.0.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "server-only": "^0.0.1",
+    "socket.io-client": "^4.8.1",
     "zod": "^4.1.12",
     "zustand": "^5.0.8"
   },

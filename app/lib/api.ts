@@ -1,3 +1,4 @@
+import { getToken } from '@/app/lib/auth/session';
 const API_URL = process.env.BACK_URL || "http://localhost:3001";
 
 export async function apiFetch<T>(
@@ -7,6 +8,7 @@ export async function apiFetch<T>(
   const res = await fetch(`${API_URL}${endpoint}`, {
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${await getToken()}`
     },
     cache: "no-store",
     ...options,

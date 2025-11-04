@@ -4,9 +4,10 @@ import SupplierForm from "@/components/suppliers/SupplierForm";
 export default async function EditSupplierPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const supplier = await getSupplier(params.id);
+  const { id } = await params;
+  const supplier = await getSupplier(id);
 
   return (
     <div className="p-6">

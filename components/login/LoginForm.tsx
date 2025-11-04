@@ -1,6 +1,45 @@
 "use client"
-import { signIn } from '@/app/actions/auth'
+import { signIn } from '@/app/actions/auth/auth'
+import { useActionState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import ErrorAlert from '@/components/error-alert/ErrorAlert';
+import { useUserStore, UserStore } from '@/store/userInfoStore';
+
+
+const initialState = {
+  message: '',
+  success: false,
+  user: {
+    id: "",
+    role: "",
+    name: ""
+  }
+}
+
 export default function LoginForm() {
+  const router = useRouter()
+  const [state, formAction, pending] = useActionState(signIn, initialState);
+
+
+  const { setRole, setId, setName, setIsAuthenticated } = useUserStore();
+  
+  useEffect(() => {// setea el estado 
+
+
+    if (state?.success && state.user) {
+      setRole(state.user.role)
+      setId(state.user.id)
+      setName(state.user.name)
+      setIsAuthenticated(true)
+      router.push('/home')
+      
+    }
+    
+
+
+  }, [state])
+
+
   return (
     <>
       {/*
@@ -20,9 +59,10 @@ export default function LoginForm() {
           />
           <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">Sign in to your account</h2>
         </div>
+        {state?.message && (<ErrorAlert message={state.message} />)}
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form action={signIn}>
+          <form action={formAction}>
             <div>
               <label htmlFor="email" className="block text-sm/6 font-medium text-gray-100">
                 Email address
@@ -60,6 +100,7 @@ export default function LoginForm() {
             </div>
 
             <div>
+
               <button
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"

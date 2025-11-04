@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createOrder, updateOrder } from "@/app/actions/orders";
 import { Order, orderFields, orderFieldMetadata } from "@/app/types/order";
 
-type OrderFormState = Omit<Order, "id" | "createdAt" | "updatedAt">;
+type OrderFormState = Partial<Omit<Order, "id" | "createdAt" | "updatedAt">>;
 
 export default function OrderForm({ order }: { order?: Order }) {
   const router = useRouter();
@@ -15,7 +15,8 @@ export default function OrderForm({ order }: { order?: Order }) {
       const { id, createdAt, updatedAt, ...rest } = order;
       return rest;
     }
-    return { ...orderFields };
+    const { type, lat, lng, ...base } = orderFields;
+    return { ...base };
   });
 
   useEffect(() => {

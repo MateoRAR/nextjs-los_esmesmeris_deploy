@@ -1,5 +1,4 @@
 export enum OrderType {
-  None = "none",
   Disposal = "disposal",
   Sale = "sale",
 }
@@ -11,10 +10,9 @@ export enum OrderStatus {
   Cancelled = "cancelled",
 }
 
-// Define los campos base con sus valores por defecto
 export const orderFields = {
   relatedId: "",
-  type: OrderType.None,
+  type: OrderType.Disposal,
   description: "",
   status: OrderStatus.Pending,
   lat: null as number | null,

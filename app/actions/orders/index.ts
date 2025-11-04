@@ -12,7 +12,7 @@ export async function getOrder(id: string): Promise<Order> {
   return apiFetch<Order>(`/orders/${id}`);
 }
 
-export async function createOrder(data: Omit<Order, "id" | "createdAt" | "updatedAt">) {
+export async function createOrder(data: Partial<Omit<Order, "id" | "createdAt" | "updatedAt">>) {
   await apiFetch<Order>("/orders", {
     method: "POST",
     body: JSON.stringify(data),

@@ -3,22 +3,20 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createDisposal, updateDisposal } from "@/app/actions/disposals";
-import { Disposal } from "@/app/types/disposal";
+import { Disposal, disposalFields, disposalFieldMetadata } from "@/app/types/disposal";
 
 type DisposalFormState = Omit<Disposal, "id" | "createdAt" | "updatedAt">;
-
-const NUMERIC_KEYS: Array<keyof DisposalFormState> = [
-  "totalPrice",
-  "unitPrice",
-  "productStock",
-];
 
 export default function DisposalForm({ disposal }: { disposal?: Disposal }) {
   const router = useRouter();
 
-  const [form, setForm] = useState<DisposalFormState>(
-    disposal ? (({ id, createdAt, updatedAt, ...rest }) => rest)(disposal) : ({} as DisposalFormState)
-  );
+  const [form, setForm] = useState<DisposalFormState>(() => {
+    if (disposal) {
+      const { id, createdAt, updatedAt, ...rest } = disposal;
+      return rest;
+    }
+    return { ...disposalFields };
+  });
 
   useEffect(() => {
     if (disposal) {
@@ -27,32 +25,47 @@ export default function DisposalForm({ disposal }: { disposal?: Disposal }) {
     }
   }, [disposal]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    
     setForm((prev) => ({
       ...prev,
-      [name]: NUMERIC_KEYS.includes(name as keyof DisposalFormState)
-        ? Number(value)
-        : value,
-    } as DisposalFormState));
+      [name]: type === "number" ? Number(value) : value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const payload = Object.fromEntries(
-      Object.entries(form).map(([k, v]) => [
-        k,
-        NUMERIC_KEYS.includes(k as keyof DisposalFormState) ? Number(v as any) : v,
-      ])
-    ) as DisposalFormState;
-
-    if (disposal) await updateDisposal(disposal.id, payload);
-    else await createDisposal(payload);
+    
+    if (disposal) await updateDisposal(disposal.id, form);
+    else await createDisposal(form);
     router.push("/disposals");
   };
 
-  const excludedKeys: Array<keyof Disposal> = ["id", "createdAt", "updatedAt"];
+  const getInputType = (value: any): string => {
+    if (typeof value === "number") return "number";
+    if (typeof value === "boolean") return "checkbox";
+    return "text";
+  };
+
+  const isEnum = (key: string): boolean => {
+    return disposalFieldMetadata[key]?.type === 'enum';
+  };
+
+  const getEnumOptions = (key: string) => {
+    const metadata = disposalFieldMetadata[key];
+    if (metadata?.type === 'enum') {
+      return Object.values(metadata.options);
+    }
+    return [];
+  };
+
+  const formatLabel = (key: string): string => {
+    return key
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, (str) => str.toUpperCase())
+      .trim();
+  };
 
   return (
     <form
@@ -63,22 +76,67 @@ export default function DisposalForm({ disposal }: { disposal?: Disposal }) {
         {disposal ? "Editar disposición" : "Nueva disposición"}
       </h2>
 
-      {Object.entries(form)
-        .filter(([key]) => !(excludedKeys as string[]).includes(key))
-        .map(([key, value]) => (
+      {Object.entries(form).map(([key, value]) => {
+        // Si es un enum, renderiza un select
+        if (isEnum(key)) {
+          return (
+            <div key={key}>
+              <label className="block text-sm font-medium text-gray-600">
+                {formatLabel(key)}
+              </label>
+              <select
+                name={key}
+                value={String(value)}
+                onChange={handleChange}
+                required
+                className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-200"
+              >
+                {getEnumOptions(key).map((option) => (
+                  <option key={String(option)} value={String(option)}>
+                    {String(option)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          );
+        }
+
+        // Si es notes, renderiza un textarea
+        if (key === "notes") {
+          return (
+            <div key={key}>
+              <label className="block text-sm font-medium text-gray-600">
+                {formatLabel(key)}
+              </label>
+              <textarea
+                name={key}
+                value={String(value ?? "")}
+                onChange={handleChange}
+                rows={3}
+                className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-200"
+              />
+            </div>
+          );
+        }
+
+        // Para otros tipos, renderiza input
+        const inputType = getInputType(value);
+        return (
           <div key={key}>
-            <label className="block text-sm font-medium text-gray-600 capitalize">
-              {key}
+            <label className="block text-sm font-medium text-gray-600">
+              {formatLabel(key)}
             </label>
             <input
               name={key}
+              type={inputType}
               value={String(value ?? "")}
               onChange={handleChange}
-              required={key !== "notes"}
+              required
               className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-200"
             />
           </div>
-        ))}
+        );
+      })}
 
       <button
         type="submit"
@@ -89,5 +147,3 @@ export default function DisposalForm({ disposal }: { disposal?: Disposal }) {
     </form>
   );
 }
-
-

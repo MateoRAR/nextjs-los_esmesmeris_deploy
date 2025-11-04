@@ -8,7 +8,7 @@ export async function signIn(prevState: any, formData: FormData) {
     email: formData.get('email'),
     password: formData.get('password'),
   })
-  const response = await fetch(process.env.BACK_URL + '/auth/login',
+  const response = await fetch(process.env.NEXT_PUBLIC_BACK_URL+ '/auth/login',
     {
       method: "POST", body: JSON.stringify(validatedFields.data),
       headers: {

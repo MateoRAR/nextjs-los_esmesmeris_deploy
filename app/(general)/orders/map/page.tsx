@@ -14,6 +14,8 @@ export default function OrdersMapPage() {
   const map = useRef<mapboxgl.Map | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
   const markersRef = useRef<Map<string, mapboxgl.Marker>>(new Map());
 
   // Initialize orders from server
@@ -55,26 +57,82 @@ export default function OrdersMapPage() {
 
   // Initialize Mapbox map
   useEffect(() => {
-    if (!mapContainer.current || map.current || !MAPBOX_TOKEN) return;
+    if (!mapContainer.current || map.current || !MAPBOX_TOKEN) {
+      if (!MAPBOX_TOKEN) {
+        console.error('Mapbox token no configurado');
+      }
+      return;
+    }
 
     mapboxgl.accessToken = MAPBOX_TOKEN;
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [-74.006, 40.7128], // Default to NYC, you can change this
-      zoom: 10,
-    });
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [-74.006, 40.7128], // Default to NYC, you can change this
+        zoom: 10,
+        attributionControl: false,
+      });
 
-    map.current.addControl(new mapboxgl.NavigationControl());
+      // Manejar errores de carga del mapa
+      map.current.on('error', (e) => {
+        console.error('Error de Mapbox:', e);
+        let errorMessage = 'Error al cargar el mapa';
+        
+        if (e.error && e.error.message) {
+          console.error('Mensaje de error:', e.error.message);
+          if (e.error.message.includes('token') || e.error.message.includes('401')) {
+            errorMessage = 'Token de Mapbox inválido o no autorizado. Verifica NEXT_PUBLIC_MAPBOX_TOKEN';
+          } else if (e.error.message.includes('style')) {
+            errorMessage = 'Error al cargar el estilo del mapa';
+          } else {
+            errorMessage = `Error: ${e.error.message}`;
+          }
+        }
+        
+        setMapError(errorMessage);
+      });
 
-    return () => {
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
-      }
-    };
-  }, []);
+      // Esperar a que el mapa esté listo antes de agregar controles
+      map.current.on('load', () => {
+        console.log('Mapa de Mapbox cargado correctamente');
+        setMapLoaded(true);
+        setMapError(null);
+        if (map.current) {
+          map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+          map.current.addControl(new mapboxgl.AttributionControl({
+            compact: true
+          }), 'bottom-right');
+        }
+      });
+
+      // Manejar errores de estilo
+      map.current.on('style.load', () => {
+        console.log('Estilo del mapa cargado');
+      });
+      
+      // Timeout para detectar si el mapa no carga
+      const loadTimeout = setTimeout(() => {
+        if (map.current && !map.current.loaded()) {
+          setMapError('El mapa está tardando en cargar. Verifica tu conexión y el token de Mapbox.');
+        }
+      }, 10000);
+
+      // Cleanup function
+      return () => {
+        clearTimeout(loadTimeout);
+        if (map.current) {
+          map.current.remove();
+          map.current = null;
+        }
+      };
+
+    } catch (error) {
+      console.error('Error al inicializar el mapa:', error);
+      setMapError('Error al inicializar el mapa. Verifica la consola para más detalles.');
+    }
+  }, [MAPBOX_TOKEN]);
 
   // Update markers when orders change
   useEffect(() => {
@@ -152,6 +210,12 @@ export default function OrdersMapPage() {
           <p className="text-sm">
             Por favor, configura NEXT_PUBLIC_MAPBOX_TOKEN en tu archivo .env.local
           </p>
+          <p className="text-sm mt-2">
+            Obtén tu token en: <a href="https://account.mapbox.com/access-tokens/" target="_blank" rel="noopener noreferrer" className="underline">https://account.mapbox.com/access-tokens/</a>
+          </p>
+          <p className="text-sm mt-2">
+            También asegúrate de tener BACK_URL configurado para la conexión WebSocket
+          </p>
         </div>
       </div>
     );
@@ -199,12 +263,31 @@ export default function OrdersMapPage() {
       </div>
       <div className="flex-1 relative">
         {loading ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
             <div className="text-gray-600">Cargando órdenes...</div>
           </div>
-        ) : (
-          <div ref={mapContainer} className="w-full h-full" />
+        ) : null}
+        {mapError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-red-50 z-20 border-2 border-red-200">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-md">
+              <p className="font-bold text-red-700 mb-2">Error al cargar el mapa</p>
+              <p className="text-sm text-red-600 mb-4">{mapError}</p>
+              <p className="text-xs text-gray-600">
+                Verifica que NEXT_PUBLIC_MAPBOX_TOKEN esté configurado correctamente en tu .env.local
+              </p>
+            </div>
+          </div>
         )}
+        {!mapLoaded && !mapError && !loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
+            <div className="text-gray-600">Cargando mapa...</div>
+          </div>
+        )}
+        <div 
+          ref={mapContainer} 
+          className="w-full h-full"
+          style={{ minHeight: '400px', display: mapError ? 'none' : 'block' }}
+        />
       </div>
     </div>
   );

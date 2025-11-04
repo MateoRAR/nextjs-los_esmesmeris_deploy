@@ -1,5 +1,5 @@
 import { getToken } from '@/app/lib/auth/session';
-const API_URL = process.env.BACK_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_BACK_URL || process.env.BACK_URL || "http://localhost:3001";
 
 export async function apiFetch<T>(
   endpoint: string,

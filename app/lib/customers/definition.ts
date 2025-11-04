@@ -15,5 +15,7 @@ export type CreateCustomerFormState =
       };
       message: string;
       success: boolean;
+      data?: any;
     }
   | undefined;
+

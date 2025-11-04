@@ -2,8 +2,8 @@ import * as z from 'zod';
 
 export const CreateSaleFormSchema = z.object({
   customerId: z.string().min(1, { message: 'El ID del cliente es requerido.' }),
-  totalAmount: z.coerce 
-    .number({ invalid_type_error: 'El monto debe ser un número.' })
+  totalAmount: z.coerce
+    .number()
     .positive({ message: 'El monto debe ser positivo.' }),
 });
 

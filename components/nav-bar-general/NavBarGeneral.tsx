@@ -11,13 +11,14 @@ import {
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useUserStore } from '@/store/userInfoStore';
 import { logout } from '@/app/actions/auth/auth';
-import { usePathname } from 'next/navigation'; // Importar usePathname
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 const navigationData = [
   { name: 'Home', href: '/home', roles: ['admin', 'employee'] },
   { name: 'Users', href: '/users', roles: ['admin'] },
-  { name: 'Ventas', href: '/sales', roles: ['admin', 'employee'] }, // <--- AÑADIDO
-  { name: 'Clientes', href: '/customers', roles: ['admin', 'employee'] }, // <--- AÑADIDO
+  { name: 'Ventas', href: '/sales', roles: ['admin', 'employee'] },
+  { name: 'Clientes', href: '/customers', roles: ['admin', 'employee'] },
 ];
 
 function classNames(...classes: (string | boolean | undefined)[]) {
@@ -33,7 +34,6 @@ export default function NavBarGeneral() {
     logout();
   }
 
-  // Filtrar navegación basada en el rol
   const userNavigation = navigationData.filter(item => item.roles.includes(role));
 
   return (
@@ -71,7 +71,7 @@ export default function NavBarGeneral() {
                 {userNavigation.map((item) => {
                   const current = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
                   return (
-                    <a
+                    <Link
                       key={item.name}
                       href={item.href}
                       aria-current={current ? 'page' : undefined}
@@ -83,7 +83,7 @@ export default function NavBarGeneral() {
                       )}
                     >
                       {item.name}
-                    </a>
+                    </Link>
                   )
                 })}
               </div>
@@ -153,7 +153,7 @@ export default function NavBarGeneral() {
             return (
               <DisclosureButton
                 key={item.name}
-                as="a"
+                as={Link}
                 href={item.href}
                 aria-current={current ? 'page' : undefined}
                 className={classNames(

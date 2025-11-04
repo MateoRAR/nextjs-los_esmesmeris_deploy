@@ -1,25 +1,33 @@
 'use client';
 
-import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Button } from 'flowbite-react';
-import { useState, useEffect } from 'react';
+import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Button, Badge } from 'flowbite-react';
 
-// Props: espera un array de ventas
 export default function SalesTable({ sales }: { sales: any[] }) {
   
-  // Se Define las keys (columnas) que quieres mostrar de tu objeto "sale"
-  // Asumamos que una venta tiene: id, amount, customerId, createdAt
-  const keysToShow: string[] = sales[0] ? Object.keys(sales[0]).filter((key) => 
-    key === 'id' || key === 'amount' || key === 'customerId' || key === 'createdAt'
-  ) : [];
+  // Si no hay ventas, mostrar mensaje
+  if (!sales || sales.length === 0) {
+    return (
+      <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+        <p className="text-lg">No hay ventas registradas.</p>
+        <p className="text-sm mt-2">Haz clic en "Crear Nueva Venta" para registrar tu primera venta.</p>
+      </div>
+    );
+  }
+
+  // Definir las columnas a mostrar para ventas
+  const keysToShow = ['id', 'customerId', 'employeeId', 'totalAmount', 'status', 'createdAt'];
 
   return (
-    <div className="overflow-x-auto p-4">
+    <div className="overflow-x-auto">
       <Table hoverable>
         <TableHead>
           <TableRow>
-            {keysToShow.map((key) => (
-              <TableHeadCell key={key}>{key}</TableHeadCell>
-            ))}
+            <TableHeadCell>ID</TableHeadCell>
+            <TableHeadCell>Cliente</TableHeadCell>
+            <TableHeadCell>Empleado</TableHeadCell>
+            <TableHeadCell>Monto Total</TableHeadCell>
+            <TableHeadCell>Estado</TableHeadCell>
+            <TableHeadCell>Fecha</TableHeadCell>
             <TableHeadCell>
               <span className="sr-only">Acciones</span>
             </TableHeadCell>
@@ -27,16 +35,28 @@ export default function SalesTable({ sales }: { sales: any[] }) {
         </TableHead>
         <TableBody className="divide-y">
           {sales.map((sale) => (
-            <TableRow className="bg-white dark:border-gray-700 dark:bg-gray-800" key={sale.id + 'tablerow'}>
-              {keysToShow.map((key) => (
-                <TableCell key={sale.id + key}>
-                  {/* Formatear la fecha si es 'createdAt' */}
-                  {key === 'createdAt' ? new Date(sale[key]).toLocaleDateString() : sale[key]}
-                </TableCell>
-              ))}
+            <TableRow className="bg-white dark:border-gray-700 dark:bg-gray-800" key={sale.id}>
+              <TableCell className="font-medium text-gray-900 dark:text-white">
+                {sale.id?.substring(0, 8)}...
+              </TableCell>
+              <TableCell>{sale.customerId?.substring(0, 8)}...</TableCell>
+              <TableCell>{sale.employeeId?.substring(0, 8)}...</TableCell>
+              <TableCell className="font-semibold">
+                ${typeof sale.totalAmount === 'number' ? sale.totalAmount.toFixed(2) : sale.totalAmount}
+              </TableCell>
+              <TableCell>
+                <Badge 
+                  color={sale.status === 'completed' ? 'success' : sale.status === 'pending' ? 'warning' : 'failure'}
+                >
+                  {sale.status || 'pending'}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                {sale.createdAt ? new Date(sale.createdAt).toLocaleDateString() : 'N/A'}
+              </TableCell>
               <TableCell className="flex gap-2">
-                <Button size="xs" color="blue">Editar</Button>
-                <Button size="xs" color="red">Eliminar</Button>
+                <Button size="xs" color="blue">Ver Detalles</Button>
+                <Button size="xs" color="red">Cancelar</Button>
               </TableCell>
             </TableRow>
           ))}

@@ -1,9 +1,8 @@
 'use server';
 
 import { decryptSession, getToken } from '@/app/lib/auth/session'; 
-import { CreateSaleFormSchema, CreateSaleFormState } from '@/app/lib/sales/definitions';
+import { CreateSaleFormSchema } from '@/app/lib/sales/definitions';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
 export async function getSales() {
   const token = await getToken();
@@ -32,10 +31,7 @@ export async function getSales() {
   }
 }
 
-export async function createSale(
-  prevState: CreateSaleFormState,
-  formData: FormData,
-): Promise<CreateSaleFormState> {
+export async function createSale(data: { customerId: string; totalAmount: string | number }) {
   const token = await getToken();
   const session = await decryptSession(); 
   
@@ -45,10 +41,7 @@ export async function createSale(
     return { message: 'No autenticado. No se pudo crear la venta.', success: false };
   }
 
-  const validatedFields = CreateSaleFormSchema.safeParse({
-    customerId: formData.get('customerId'),
-    totalAmount: formData.get('totalAmount'),
-  });
+  const validatedFields = CreateSaleFormSchema.safeParse(data);
 
   if (!validatedFields.success) {
     console.log(validatedFields.error.flatten().fieldErrors);
@@ -60,14 +53,14 @@ export async function createSale(
   }
 
   const saleData = {
-    ...validatedFields.data,
+    customerId: validatedFields.data.customerId,
     employeeId: employeeId,
+    totalAmount: validatedFields.data.totalAmount,
     items: [],
     status: 'pending',
   };
 
   try {
-    // MODIFICADO: Se quitó /api/ de la ruta
     const response = await fetch(process.env.BACK_URL + '/sales', {
       method: 'POST',
       headers: {
@@ -80,20 +73,27 @@ export async function createSale(
     const body = await response.json();
 
     if (!response.ok) {
+      const errorMessage = Array.isArray(body.message) 
+        ? body.message.join(', ') 
+        : (body.message || 'Error del servidor al crear la venta.');
+      
       return {
-        message: body.message || 'Error del servidor al crear la venta.',
+        message: errorMessage,
         success: false,
       };
     }
+
+    revalidatePath('/sales');
+    
+    return { 
+      message: 'Venta creada exitosamente.', 
+      success: true,
+      data: body 
+    };
+
   } catch (error) {
-    console.error(error);
+    console.error('Error en createSale:', error);
     return { message: 'Error de red. No se pudo crear la venta.', success: false };
   }
-
-  revalidatePath('/sales');
-  redirect('/sales');
-
-  // Esta parte no se ejecutará debido al redirect, pero es buena práctica
-  // return { message: 'Venta creada exitosamente.', success: true };
 }
 

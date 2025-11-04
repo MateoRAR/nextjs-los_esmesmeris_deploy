@@ -4,8 +4,6 @@ import { useUserStore } from '@/store/userInfoStore';
 export default function Home() {
   const {id,role,name,isAuthenticated} = useUserStore(); 
 
-  
-
   return (
     <div>
       <h1>Usuarios</h1>

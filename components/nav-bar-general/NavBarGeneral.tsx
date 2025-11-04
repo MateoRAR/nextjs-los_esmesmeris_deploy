@@ -1,25 +1,41 @@
-"use client"
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { useUserStore } from '@/store/userInfoStore'
-import { logout } from '@/app/actions/auth/auth'
-const navigation = [
-  { name: 'Home', href: '/home', current: false, roles: ['admin', 'employee'] },
-  { name: 'Users', href: '/users', current: false, roles: ['admin']  },
-  { name: 'Nada_De_momento 0', href: '#', current: false, roles: ['admin', 'employee'] },
-  { name: 'Nada_De_Momento 1 ', href: '#', current: false, roles: ['admin', 'employee'] }
-]
+'use client';
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+} from '@headlessui/react';
+import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useUserStore } from '@/store/userInfoStore';
+import { logout } from '@/app/actions/auth/auth';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
+const navigationData = [
+  { name: 'Home', href: '/home', roles: ['admin', 'employee'] },
+  { name: 'Users', href: '/users', roles: ['admin'] },
+  { name: 'Ventas', href: '/sales', roles: ['admin', 'employee'] },
+  { name: 'Clientes', href: '/customers', roles: ['admin', 'employee'] },
+];
+
+function classNames(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(' ');
 }
 
 export default function NavBarGeneral() {
-  const { role, clean} = useUserStore();
-  function handleLogout(){
+  const { role, clean } = useUserStore();
+  const pathname = usePathname(); // Hook para obtener la ruta actual
+
+  function handleLogout() {
     clean();
     logout();
   }
+
+  const userNavigation = navigationData.filter(item => item.roles.includes(role));
+
   return (
     <Disclosure
       as="nav"
@@ -32,38 +48,44 @@ export default function NavBarGeneral() {
             <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-white/5 hover:text-white focus:outline-2 focus:-outline-offset-1 focus:outline-indigo-500">
               <span className="absolute -inset-0.5" />
               <span className="sr-only">Open main menu</span>
-              <Bars3Icon aria-hidden="true" className="block size-6 group-data-open:hidden" />
-              <XMarkIcon aria-hidden="true" className="hidden size-6 group-data-open:block" />
+              <Bars3Icon
+                aria-hidden="true"
+                className="block size-6 group-data-open:hidden"
+              />
+              <XMarkIcon
+                aria-hidden="true"
+                className="hidden size-6 group-data-open:block"
+              />
             </DisclosureButton>
           </div>
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex shrink-0 items-center">
               <img
                 alt="Your Company"
-                src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
+                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
                 className="h-8 w-auto"
               />
             </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
-                {navigation.map((item) => 
-                item.roles.includes(role) &&(<a
-                    key={item.name}
-                    href={item.href}
-                    aria-current={item.current ? 'page' : undefined}
-                    className={classNames(
-                      item.current
-                        ? 'bg-gray-900 text-white dark:bg-gray-950/50'
-                        : 'text-gray-300 hover:bg-white/5 hover:text-white',
-                      'rounded-md px-3 py-2 text-sm font-medium',
-                    )}
-                  >
-                    {item.name}
-                  </a>)
-
-                )}
-
-
+                {userNavigation.map((item) => {
+                  const current = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      aria-current={current ? 'page' : undefined}
+                      className={classNames(
+                        current
+                          ? 'bg-gray-900 text-white dark:bg-gray-950/50'
+                          : 'text-gray-300 hover:bg-white/5 hover:text-white',
+                        'rounded-md px-3 py-2 text-sm font-medium',
+                      )}
+                    >
+                      {item.name}
+                    </Link>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -126,26 +148,27 @@ export default function NavBarGeneral() {
 
       <DisclosurePanel className="sm:hidden">
         <div className="space-y-1 px-2 pt-2 pb-3">
-          {navigation.map((item) => (
-            <DisclosureButton
-              key={item.name}
-              as="a"
-              href={item.href}
-              aria-current={item.current ? 'page' : undefined}
-              className={classNames(
-                item.current
-                  ? 'bg-gray-900 text-white dark:bg-gray-950/50'
-                  : 'text-gray-300 hover:bg-white/5 hover:text-white',
-                'block rounded-md px-3 py-2 text-base font-medium',
-              )}
-            >
-              {item.name}
-            </DisclosureButton>
-          ))}
+          {userNavigation.map((item) => {
+            const current = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+            return (
+              <DisclosureButton
+                key={item.name}
+                as={Link}
+                href={item.href}
+                aria-current={current ? 'page' : undefined}
+                className={classNames(
+                  current
+                    ? 'bg-gray-900 text-white dark:bg-gray-950/50'
+                    : 'text-gray-300 hover:bg-white/5 hover:text-white',
+                  'block rounded-md px-3 py-2 text-base font-medium',
+                )}
+              >
+                {item.name}
+              </DisclosureButton>
+            )
+          })}
         </div>
       </DisclosurePanel>
     </Disclosure>
-  )
+  );
 }
-
-

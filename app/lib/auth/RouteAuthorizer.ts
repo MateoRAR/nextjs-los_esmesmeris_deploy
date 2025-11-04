@@ -1,7 +1,10 @@
 export class RouteAuthorizer {
   private static readonly routes: Map<string, string[]> = new Map([
-    ['admin', ['/home', '/users', '/users/*', '/suppliers', '/suppliers/*']],
-    ['employee', ['/home', '/employee/*']],
+
+    ['admin', ['/home', '/users', '/users/*', '/sales', '/sales/*', '/customers', '/customers/*', '/suppliers', '/suppliers/*',
+      '/disposals', '/disposals/*', '/orders', '/orders/*', '/products', '/products/*'
+    ]],
+    ['employee', ['/home', '/sales', '/sales/*', '/customers', '/customers/*','/employee/*']],
     ['public', ['/', '/login']],
   ])
 

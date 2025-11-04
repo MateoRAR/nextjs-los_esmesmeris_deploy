@@ -11,9 +11,13 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
     "@types/mapbox-gl": "^3.4.1",
+    "@mui/icons-material": "^7.3.5",
+    "@mui/material": "^7.3.5",
     "cookie": "^1.0.2",
     "cors": "^2.8.5",
     "flowbite-react": "^0.12.10",

@@ -15,7 +15,7 @@ export async function apiFetch<T>(
   });
 
   if (!res.ok) {
-    throw new Error(`Error: ${res.status}`);
+    throw new Error(`Error: ${res.status}, ${await res.text()}`);
   }
 
   if (res.status === 204 || res.headers.get('content-length') === '0') {

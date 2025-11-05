@@ -2,7 +2,7 @@ export class RouteAuthorizer {
   private static readonly routes: Map<string, string[]> = new Map([
     ['admin', ['/home', '/users', '/users/*', '/sales', '/sales/*', '/customers', '/customers/*']],
     ['employee', ['/home', '/sales', '/sales/*', '/customers', '/customers/*']],
-    ['public', ['/', '/login']],
+    ['public', ['/', '/login', '/register', '/about' ]],
   ])
 
   static isAllowed(role: string, path: string): boolean {

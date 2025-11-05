@@ -11,7 +11,11 @@ const initialState = {
   message: "",
 };
 
-export default function UserInfo({ user }) {
+interface UserInfoProps {
+  user: any; // Replace 'any' with your actual user type if available
+}
+
+export default function UserInfo({ user }: UserInfoProps) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(updateUser, initialState);
 

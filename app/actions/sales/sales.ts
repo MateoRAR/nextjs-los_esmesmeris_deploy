@@ -34,12 +34,12 @@ export async function getSales() {
 export async function createSale(data: { 
   customerId: string; 
   totalAmount: string | number;
+  status?: string;
   items?: Array<{ productId: string; quantity: number; unitPrice: number }>;
 }) {
   const token = await getToken();
   const session = await decryptSession(); 
   
-  // El campo correcto es user_id según el JWT
   const employeeId = session?.user_id || session?.id || session?.sub || session?.userId; 
 
   if (!token || !employeeId) {
@@ -62,7 +62,7 @@ export async function createSale(data: {
     employeeId: employeeId,
     totalAmount: validatedFields.data.totalAmount,
     items: data.items || [],
-    status: 'pending',
+    status: data.status || 'pending', // Usar el estado proporcionado o 'pending' por defecto
   };
 
   try {
@@ -134,3 +134,64 @@ export async function getSaleById(saleId: string) {
   }
 }
 
+export async function cancelSale(saleId: string) {
+  const token = await getToken();
+  if (!token) {
+    return { success: false, message: 'No autenticado' };
+  }
+
+  try {
+    const response = await fetch(`${process.env.BACK_URL}/sales/${saleId}/cancel`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json();
+      return {
+        success: false,
+        message: errorBody.message || 'Error al cancelar la venta',
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/sales');
+    revalidatePath(`/sales/${saleId}`);
+    
+    return { 
+      success: true, 
+      message: 'Venta cancelada exitosamente',
+      data: result 
+    };
+  } catch (error) {
+    console.error('Error en cancelSale:', error);
+    return { success: false, message: 'Error de red al cancelar la venta' };
+  }
+}
+
+export async function updateSaleStatus(saleId: string, status: string) {
+  const token = await getToken();
+  if (!token) {
+    return { success: false, message: 'No autenticado' };
+  }
+
+  try {
+    // Si el estado es 'cancelled', usar el endpoint específico de cancelar
+    if (status === 'cancelled') {
+      return await cancelSale(saleId);
+    }
+
+    // Si necesitas un endpoint general para actualizar estado, agrégalo aquí
+    // Por ahora, solo soportamos cancelar
+    return {
+      success: false,
+      message: 'Solo se puede cambiar el estado a cancelado. Para otros estados, contacta al administrador.',
+    };
+  } catch (error) {
+    console.error('Error en updateSaleStatus:', error);
+    return { success: false, message: 'Error al actualizar el estado de la venta' };
+  }
+}

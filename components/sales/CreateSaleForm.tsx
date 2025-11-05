@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ErrorAlert from '@/components/error-alert/ErrorAlert';
 import SuccessAlert from '@/components/success-alert/SuccessAlert';
-import { Button, Label, TextInput, Card, Spinner, Modal } from 'flowbite-react';
+import { Button, Label, TextInput, Card, Spinner, Modal, Select } from 'flowbite-react';
 import Link from 'next/link';
 import CreateCustomerForm from '@/components/customers/CreateCustomerForm';
 
@@ -56,6 +56,7 @@ export default function CreateSaleForm() {
   const [saleLoading, setSaleLoading] = useState(false);
   const [saleError, setSaleError] = useState<string | null>(null);
   const [saleSuccess, setSaleSuccess] = useState<string | null>(null);
+  const [saleStatus, setSaleStatus] = useState<string>('pending');
 
   // Función para buscar clientes
   const handleSearchCustomer = async () => {
@@ -202,6 +203,7 @@ export default function CreateSaleForm() {
 
     const result = await createSale({
       ...validatedFields.data,
+      status: saleStatus,
       items: saleItems.map(item => ({
         productId: item.productId,
         quantity: item.quantity,
@@ -442,6 +444,25 @@ export default function CreateSaleForm() {
           <form onSubmit={handleCreateSale} className="mt-6 space-y-6">
             {saleSuccess && <SuccessAlert message={saleSuccess} />}
             {saleError && <ErrorAlert message={saleError} />}
+
+            {/* Selector de Estado */}
+            {customer && saleItems.length > 0 && (
+              <div>
+                <Label htmlFor="saleStatus" className="mb-2 block">
+                  Estado de la Venta
+                </Label>
+                <Select
+                  id="saleStatus"
+                  value={saleStatus}
+                  onChange={(e) => setSaleStatus(e.target.value)}
+                  required
+                >
+                  <option value="pending">Pendiente</option>
+                  <option value="completed">Completada</option>
+                  <option value="cancelled">Cancelada</option>
+                </Select>
+              </div>
+            )}
 
             {/* Botones de Acción */}
             <div className="flex gap-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, Suspense } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { getOrders } from '@/app/actions/orders';
@@ -12,7 +12,7 @@ import { Spinner } from 'flowbite-react';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 
-export default function OrdersMapPage() {
+function OrdersMapContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
@@ -419,6 +419,19 @@ export default function OrdersMapPage() {
         />
       </div>
     </div>
+  );
+}
+
+export default function OrdersMapPage() {
+  return (
+    <Suspense fallback={
+      <div className="h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <Spinner size="xl" className="mb-4" />
+        <p className="text-gray-600 dark:text-gray-400 font-medium">Cargando mapa...</p>
+      </div>
+    }>
+      <OrdersMapContent />
+    </Suspense>
   );
 }
 

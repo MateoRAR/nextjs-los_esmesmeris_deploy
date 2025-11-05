@@ -109,3 +109,30 @@ export async function deleteUser(id:string) {
   const json = await ans.json();
   return json;
 }
+
+export async function searchUsersByName(name: string) {
+  try {
+    const token = await getToken();
+    if (!token) {
+      return { success: false, message: 'No autenticado', data: [] };
+    }
+
+    const response = await fetch(`${process.env.BACK_URL}/users?name=${encodeURIComponent(name)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      return { success: false, message: 'Error al buscar usuarios', data: [] };
+    }
+
+    const users = await response.json();
+    return { success: true, data: Array.isArray(users) ? users : [] };
+  } catch (error) {
+    console.error('Error en searchUsersByName:', error);
+    return { success: false, message: 'Error al buscar usuarios', data: [] };
+  }
+}

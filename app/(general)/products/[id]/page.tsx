@@ -10,7 +10,7 @@ export default async function EditProductPage({
   const product = await getProduct(id);
 
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-4xl mx-auto">
       <ProductForm product={product} />
     </div>
   );

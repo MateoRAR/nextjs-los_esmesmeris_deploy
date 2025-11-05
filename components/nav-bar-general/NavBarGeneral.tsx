@@ -19,6 +19,9 @@ const navigationData = [
   { name: 'Users', href: '/users', roles: ['admin'] },
   { name: 'Ventas', href: '/sales', roles: ['admin', 'employee'] },
   { name: 'Clientes', href: '/customers', roles: ['admin', 'employee'] },
+  { name: 'Productos', href: '/products', roles: ['admin', 'employee'] },
+  { name: 'Órdenes', href: '/orders', roles: ['admin', 'employee'] },
+  { name: 'Bajas', href: '/disposals', roles: ['admin', 'employee'] },
 ];
 
 function classNames(...classes: (string | boolean | undefined)[]) {

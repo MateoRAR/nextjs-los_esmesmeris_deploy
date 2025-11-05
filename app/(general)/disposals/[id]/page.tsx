@@ -10,7 +10,7 @@ export default async function EditDisposalPage({
   const disposal = await getDisposal(id);
 
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-4xl mx-auto">
       <DisposalForm disposal={disposal} />
     </div>
   );

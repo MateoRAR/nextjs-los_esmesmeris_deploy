@@ -45,25 +45,31 @@ export function useOrdersWebSocket(
     socket.on('connect', () => {
       setIsConnected(true);
       setSocketError(null);
-      console.log('WebSocket connected');
+      console.log('✅ Conexión establecida con el servidor');
     });
 
     socket.on('disconnect', () => {
       setIsConnected(false);
-      console.log('WebSocket disconnected');
+      console.log('🔌 Desconectado del servidor');
     });
 
     socket.on('connect_error', (error) => {
-      setSocketError(`Error de conexión: ${error.message}`);
-      console.error('Socket.IO connection error:', error);
-      console.error('Intentando conectar a:', BACK_URL);
-      console.warn('Nota: Vercel no soporta WebSockets. Usando polling HTTP como alternativa.');
+      // No mostrar como error crítico si estamos usando polling como alternativa
+      if (isVercelLike) {
+        setSocketError(null); // No mostrar error en Vercel, es esperado
+        console.info('ℹ️ Usando polling HTTP (WebSockets no disponibles en este entorno)');
+      } else {
+        setSocketError(`Conexión: ${error.message}`);
+        console.warn('⚠️ Error de WebSocket, usando polling como alternativa:', error.message);
+      }
     });
 
     // Manejar errores de transporte
     socket.on('error', (error) => {
-      console.error('Socket.IO error:', error);
-      setSocketError(`Error del socket: ${error.message || 'Error desconocido'}`);
+      if (!isVercelLike) {
+        console.warn('⚠️ Error de Socket.IO:', error);
+        setSocketError(`Socket: ${error.message || 'Error de conexión'}`);
+      }
     });
 
 
@@ -83,8 +89,8 @@ export function useOrdersWebSocket(
           socket.disconnect();
         }
         
-        console.warn('Usando polling manual (WebSocket no disponible en Vercel)');
-        setSocketError(isVercelLike ? 'Vercel: usando polling HTTP' : 'Usando polling manual (WebSocket no disponible)');
+        console.info('📡 Modo polling HTTP activado (actualización cada 5 segundos)');
+        setSocketError(null); // No mostrar como error
         setIsConnected(true); // Marcar como "conectado" para UI
         
         // Función para hacer polling manual
@@ -101,7 +107,8 @@ export function useOrdersWebSocket(
             
             if (!response.ok) {
               if (response.status === 401) {
-                setSocketError('No autenticado - por favor inicia sesión');
+                setSocketError('Sesión expirada');
+                setIsConnected(false);
                 return;
               }
               throw new Error(`HTTP ${response.status}`);
@@ -124,8 +131,8 @@ export function useOrdersWebSocket(
               });
             }
           } catch (error) {
-            console.error('Error en polling manual:', error);
-            setSocketError('Error al obtener órdenes');
+            console.warn('⚠️ Error en polling:', error instanceof Error ? error.message : 'Error desconocido');
+            // No establecer error crítico, solo logging
           }
         };
 

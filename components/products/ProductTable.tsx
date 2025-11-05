@@ -29,6 +29,7 @@ export default function ProductTable({ products }: { products: Product[] }) {
 
   const formatColumnName = (key: string): string => {
     const columnNames: Record<string, string> = {
+      id: "ID Producto",
       name: "Nombre",
       description: "Descripción",
       price: "Precio",
@@ -41,6 +42,11 @@ export default function ProductTable({ products }: { products: Product[] }) {
 
   const formatValue = (key: string, value: any): string => {
     if (value === null || value === undefined) return "-";
+    
+    // Format ID - show first 8 characters
+    if (key === "id" && typeof value === "string") {
+      return value.substring(0, 8);
+    }
     
     // Format dates
     if (key === "creationDate" && value) {
@@ -101,9 +107,9 @@ export default function ProductTable({ products }: { products: Product[] }) {
     );
   }
 
-  // Dynamic columns from first product
+  // Dynamic columns from first product (including id, excluding supplier and timestamps)
   const columns = Object.keys(products[0]).filter(
-    (key) => !["id", "supplier"].includes(key)
+    (key) => !["supplier", "createdAt", "updatedAt"].includes(key)
   );
 
   return (

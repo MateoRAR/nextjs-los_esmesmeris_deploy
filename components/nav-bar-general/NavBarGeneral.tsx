@@ -21,7 +21,8 @@ const navigationData = [
   { name: 'Clientes', href: '/customers', roles: ['admin', 'employee'] },
   { name: 'Productos', href: '/products', roles: ['admin', 'employee'] },
   { name: 'Órdenes', href: '/orders', roles: ['admin', 'employee'] },
-  { name: 'Bajas', href: '/disposals', roles: ['admin', 'employee'] },
+  { name: 'Disposiciones', href: '/disposals', roles: ['admin', 'employee'] },
+  { name: 'Proveedores', href: '/suppliers', roles: ['admin', 'employee'] },
 ];
 
 function classNames(...classes: (string | boolean | undefined)[]) {

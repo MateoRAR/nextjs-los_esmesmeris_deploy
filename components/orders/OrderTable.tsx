@@ -29,13 +29,13 @@ export default function OrderTable({ orders }: { orders: Order[] }) {
 
   const formatColumnName = (key: string): string => {
     const columnNames: Record<string, string> = {
-      supplierId: "ID Proveedor",
-      productId: "ID Producto",
-      quantity: "Cantidad",
-      orderDate: "Fecha Orden",
-      expectedDeliveryDate: "Fecha Esperada",
+      id: "ID Orden",
+      relatedId: "ID Relacionado",
+      type: "Tipo",
+      description: "Descripción",
       status: "Estado",
-      totalCost: "Costo Total",
+      lat: "Latitud",
+      lng: "Longitud",
     };
     return columnNames[key] || key.charAt(0).toUpperCase() + key.slice(1);
   };
@@ -43,32 +43,32 @@ export default function OrderTable({ orders }: { orders: Order[] }) {
   const formatValue = (key: string, value: any): string => {
     if (value === null || value === undefined) return "-";
     
-    // Format dates
-    if ((key === "orderDate" || key === "expectedDeliveryDate") && typeof value === "string") {
-      const date = new Date(value);
-      return date.toLocaleDateString("es-ES");
+    // Format ID - show first 8 characters
+    if (key === "id" && typeof value === "string") {
+      return value.substring(0, 8);
     }
     
-    // Format currency
-    if (key === "totalCost" && typeof value === "number") {
-      return value.toLocaleString("es-CO", {
-        style: "currency",
-        currency: "COP",
-        minimumFractionDigits: 2,
-      });
+    // Format coordinates
+    if ((key === "lat" || key === "lng") && typeof value === "number") {
+      return value.toFixed(6);
     }
 
-    // Format numbers
-    if (key === "quantity" && typeof value === "number") {
-      return value.toLocaleString("es-CO");
+    // Type translation
+    if (key === "type") {
+      const typeMap: Record<string, string> = {
+        disposal: "Disposición",
+        sale: "Venta",
+      };
+      return typeMap[String(value)] || String(value);
     }
 
     // Status translation
     if (key === "status") {
       const statusMap: Record<string, string> = {
         pending: "Pendiente",
-        completed: "Completada",
-        cancelled: "Cancelada",
+        in_transit: "En Tránsito",
+        delivered: "Entregado",
+        cancelled: "Cancelado",
       };
       return statusMap[String(value)] || String(value);
     }
@@ -79,7 +79,8 @@ export default function OrderTable({ orders }: { orders: Order[] }) {
   const getStatusBadge = (status: string) => {
     const statusStyles: Record<string, string> = {
       pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-      completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+      in_transit: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+      delivered: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
       cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
     };
     
@@ -101,9 +102,9 @@ export default function OrderTable({ orders }: { orders: Order[] }) {
     );
   }
 
-  // Dynamic columns from first order
+  // Dynamic columns from first order (including id, excluding timestamps)
   const columns = Object.keys(orders[0]).filter(
-    (key) => !["id", "createdAt", "updatedAt"].includes(key)
+    (key) => !["createdAt", "updatedAt"].includes(key)
   );
 
   return (

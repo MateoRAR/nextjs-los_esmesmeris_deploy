@@ -29,11 +29,17 @@ export default function DisposalTable({ disposals }: { disposals: Disposal[] }) 
 
   const formatColumnName = (key: string): string => {
     const columnNames: Record<string, string> = {
-      productId: "ID Producto",
-      quantity: "Cantidad",
-      reason: "Razón",
-      date: "Fecha",
+      id: "ID Disposición",
+      employeeId: "ID Empleado",
+      status: "Estado",
+      totalPrice: "Precio Total",
+      unitPrice: "Precio Unitario",
       notes: "Notas",
+      productName: "Nombre Producto",
+      productDescription: "Descripción Producto",
+      productStock: "Stock Producto",
+      productCategory: "Categoría Producto",
+      supplierId: "ID Proveedor",
     };
     return columnNames[key] || key.charAt(0).toUpperCase() + key.slice(1);
   };
@@ -41,15 +47,34 @@ export default function DisposalTable({ disposals }: { disposals: Disposal[] }) 
   const formatValue = (key: string, value: any): string => {
     if (value === null || value === undefined) return "-";
     
-    // Format dates
-    if (key === "date" && typeof value === "string") {
-      const date = new Date(value);
-      return date.toLocaleDateString("es-ES");
+    // Format ID - show first 8 characters
+    if (key === "id" && typeof value === "string") {
+      return value.substring(0, 8);
+    }
+    
+    // Format currency
+    if ((key === "totalPrice" || key === "unitPrice") && typeof value === "number") {
+      return value.toLocaleString("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 2,
+      });
     }
     
     // Format numbers
-    if (key === "quantity" && typeof value === "number") {
+    if (key === "productStock" && typeof value === "number") {
       return value.toLocaleString("es-CO");
+    }
+
+    // Status translation
+    if (key === "status") {
+      const statusMap: Record<string, string> = {
+        pending: "Pendiente",
+        approved: "Aprobado",
+        rejected: "Rechazado",
+        completed: "Completado",
+      };
+      return statusMap[String(value)] || String(value);
     }
 
     return String(value);
@@ -64,9 +89,9 @@ export default function DisposalTable({ disposals }: { disposals: Disposal[] }) 
     );
   }
 
-  // Columnas dinámicas del primer elemento
+  // Columnas dinámicas del primer elemento (including id, excluding timestamps)
   const columns = Object.keys(disposals[0]).filter(
-    (key) => !["id", "createdAt", "updatedAt"].includes(key)
+    (key) => !["createdAt", "updatedAt"].includes(key)
   );
 
   return (

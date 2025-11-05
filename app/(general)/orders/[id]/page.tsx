@@ -10,7 +10,7 @@ export default async function EditOrderPage({
   const order = await getOrder(id);
 
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-4xl mx-auto">
       <OrderForm order={order} />
     </div>
   );

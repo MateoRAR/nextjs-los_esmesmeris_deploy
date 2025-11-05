@@ -120,3 +120,40 @@ export async function createCustomer(
   }
 }
 
+export async function searchCustomersByName(name: string) {
+  const token = await getToken();
+  if (!token) {
+    return { success: false, message: 'No autenticado', data: null };
+  }
+
+  try {
+    // Buscar clientes por nombre usando query parameter
+    const url = name.trim()
+      ? `${process.env.BACK_URL}/customers?name=${encodeURIComponent(name)}`
+      : `${process.env.BACK_URL}/customers`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json();
+      return {
+        success: false,
+        message: errorBody.message || 'Error al buscar clientes',
+        data: null,
+      };
+    }
+
+    const customers = await response.json();
+    return { success: true, message: 'Clientes encontrados', data: customers };
+  } catch (error) {
+    console.error('Error en searchCustomersByName:', error);
+    return { success: false, message: 'Error de red al buscar clientes', data: null };
+  }
+}
+

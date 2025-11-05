@@ -5,7 +5,7 @@ export class RouteAuthorizer {
       '/disposals', '/disposals/*', '/orders', '/orders/*', '/products', '/products/*'
     ]],
     ['employee', ['/home', '/sales', '/sales/*', '/customers', '/customers/*','/employee/*']],
-    ['public', ['/', '/login']],
+    ['public', ['/', '/login', '/register', '/about']],
   ])
 
   static isAllowed(role: string, path: string): boolean {

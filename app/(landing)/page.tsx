@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Button } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import GroupsIcon from '@mui/icons-material/Groups';
@@ -35,30 +34,23 @@ export default function LandingPage() {
           <p className="text-slate-300 text-lg md:text-xl lg:text-2xl mb-10 max-w-3xl mx-auto leading-relaxed font-light">
             Impulsa la eficiencia, reduce costos y optimiza tus operaciones con nuestra solución ERP integral diseñada para el futuro.
           </p>
-          <Link href="/login" passHref>
-            <Button
-              variant="contained"
-              endIcon={<ArrowForwardIcon />}
-              sx={{
-                backgroundColor: '#3B82F6',
-                '&:hover': {
-                  backgroundColor: '#2563EB',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 10px 25px rgba(59, 130, 246, 0.4)',
-                },
-                color: '#FFFFFF',
-                fontWeight: '600',
-                padding: '14px 40px',
-                fontSize: '1.125rem',
-                borderRadius: '12px',
-                textTransform: 'none',
-                boxShadow: '0 4px 14px rgba(59, 130, 246, 0.3)',
-                transition: 'all 0.3s ease',
-              }}
-            >
-              Comenzar Ahora
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href="/login">
+              <button className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl overflow-hidden shadow-lg shadow-blue-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/60 hover:scale-105">
+                <span className="relative z-10">Acceder al Sistema</span>
+                <ArrowForwardIcon className="relative z-10 transition-transform group-hover:translate-x-1" />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </button>
+            </Link>
+            <Link href="/about">
+              <button className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-semibold text-blue-300 bg-slate-800/50 backdrop-blur-sm rounded-xl border-2 border-blue-500/30 overflow-hidden transition-all duration-300 hover:border-blue-500/60 hover:bg-slate-800/70 hover:scale-105">
+                <span className="relative z-10">Conocer Más</span>
+                <svg className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -143,11 +135,70 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-10 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-slate-400 text-sm md:text-base">
-            &copy; {new Date().getFullYear()} <span className="font-semibold text-slate-300">ERP Los Esmeraldes</span>. Todos los derechos reservados.
-          </p>
+      <footer className="py-12 border-t border-slate-800/50 bg-slate-950/50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            {/* Columna 1: Logo y descripción */}
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <svg className="h-10 w-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="3" width="7" height="7" rx="1" fill="#3B82F6" fillOpacity="0.9"/>
+                  <rect x="3" y="14" width="7" height="7" rx="1" fill="#60A5FA" fillOpacity="0.9"/>
+                  <rect x="14" y="3" width="7" height="7" rx="1" fill="#60A5FA" fillOpacity="0.9"/>
+                  <rect x="14" y="14" width="7" height="7" rx="1" fill="#93C5FD" fillOpacity="0.9"/>
+                  <circle cx="6.5" cy="6.5" r="1.5" fill="white"/>
+                  <circle cx="17.5" cy="17.5" r="1.5" fill="white"/>
+                </svg>
+                <div>
+                  <span className="text-xl font-bold bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent block">
+                    Los Esmesmeris
+                  </span>
+                  <span className="text-xs text-blue-400 font-medium">ERP</span>
+                </div>
+              </div>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                Transformando negocios con tecnología ERP de última generación.
+              </p>
+            </div>
+
+            {/* Columna 2: Enlaces rápidos */}
+            <div>
+              <h3 className="text-white font-semibold mb-4">Enlaces Rápidos</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/" className="text-slate-400 hover:text-blue-400 text-sm transition-colors">
+                    Inicio
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/about" className="text-slate-400 hover:text-blue-400 text-sm transition-colors">
+                    Acerca de
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" className="text-slate-400 hover:text-blue-400 text-sm transition-colors">
+                    Iniciar Sesión
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Columna 3: Contacto */}
+            <div>
+              <h3 className="text-white font-semibold mb-4">Contacto</h3>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li>Email: contacto@losesmesmeris.com</li>
+                <li>Teléfono: +57 (123) 456-7890</li>
+                <li>Soporte 24/7 disponible</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-slate-800/50 pt-6 text-center">
+            <p className="text-slate-400 text-sm">
+              &copy; {new Date().getFullYear()} <span className="font-semibold text-slate-300">Los Esmesmeris ERP</span>. Todos los derechos reservados.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

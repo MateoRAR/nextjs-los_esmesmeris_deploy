@@ -19,6 +19,9 @@ const navigationData = [
   { name: 'Users', href: '/users', roles: ['admin'] },
   { name: 'Ventas', href: '/sales', roles: ['admin', 'employee'] },
   { name: 'Clientes', href: '/customers', roles: ['admin', 'employee'] },
+  { name: 'Productos', href: '/products', roles: ['admin', 'employee'] },
+  { name: 'Órdenes', href: '/orders', roles: ['admin', 'employee'] },
+  { name: 'Bajas', href: '/disposals', roles: ['admin', 'employee'] },
 ];
 
 function classNames(...classes: (string | boolean | undefined)[]) {
@@ -61,7 +64,7 @@ export default function NavBarGeneral() {
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex shrink-0 items-center">
               <img
-                alt="Your Company"
+                alt="Los Esmesmeris ERP"
                 src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
                 className="h-8 w-auto"
               />

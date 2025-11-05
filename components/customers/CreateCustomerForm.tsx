@@ -142,7 +142,7 @@ export default function CreateCustomerForm({
               Cancelar
             </Button>
           ) : (
-            <Link href="/customers" legacyBehavior>
+            <Link href="/customers">
               <Button color="gray" disabled={pending} className="flex-1">
                 Cancelar
               </Button>

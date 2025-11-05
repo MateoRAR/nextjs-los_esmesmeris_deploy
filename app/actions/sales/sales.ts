@@ -31,11 +31,16 @@ export async function getSales() {
   }
 }
 
-export async function createSale(data: { customerId: string; totalAmount: string | number }) {
+export async function createSale(data: { 
+  customerId: string; 
+  totalAmount: string | number;
+  items?: Array<{ productId: string; quantity: number; unitPrice: number }>;
+}) {
   const token = await getToken();
   const session = await decryptSession(); 
   
-  const employeeId = session?.id || session?.sub; 
+  // El campo correcto es user_id según el JWT
+  const employeeId = session?.user_id || session?.id || session?.sub || session?.userId; 
 
   if (!token || !employeeId) {
     return { message: 'No autenticado. No se pudo crear la venta.', success: false };
@@ -56,7 +61,7 @@ export async function createSale(data: { customerId: string; totalAmount: string
     customerId: validatedFields.data.customerId,
     employeeId: employeeId,
     totalAmount: validatedFields.data.totalAmount,
-    items: [],
+    items: data.items || [],
     status: 'pending',
   };
 
@@ -94,6 +99,38 @@ export async function createSale(data: { customerId: string; totalAmount: string
   } catch (error) {
     console.error('Error en createSale:', error);
     return { message: 'Error de red. No se pudo crear la venta.', success: false };
+  }
+}
+
+export async function getSaleById(saleId: string) {
+  const token = await getToken();
+  if (!token) {
+    return { success: false, message: 'No autenticado', data: null };
+  }
+
+  try {
+    const response = await fetch(`${process.env.BACK_URL}/sales/${saleId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json();
+      return {
+        success: false,
+        message: errorBody.message || 'Error al obtener la venta',
+        data: null,
+      };
+    }
+
+    const sale = await response.json();
+    return { success: true, message: 'Venta obtenida', data: sale };
+  } catch (error) {
+    console.error('Error en getSaleById:', error);
+    return { success: false, message: 'Error de red al obtener la venta', data: null };
   }
 }
 

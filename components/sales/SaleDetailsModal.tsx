@@ -1,8 +1,9 @@
 'use client';
 
-import { Modal, Badge, Spinner } from 'flowbite-react';
+import { Modal, Badge, Spinner, Button } from 'flowbite-react';
 import { useEffect, useState } from 'react';
-import { getSaleById } from '@/app/actions/sales/sales';
+import { getSaleById, cancelSale } from '@/app/actions/sales/sales';
+import { AlertTriangle, XCircle } from 'lucide-react';
 
 type SaleDetails = {
   id: string;
@@ -44,6 +45,8 @@ export default function SaleDetailsModal({ show, saleId, onClose }: SaleDetailsM
   const [loading, setLoading] = useState(false);
   const [saleDetails, setSaleDetails] = useState<SaleDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
 
   useEffect(() => {
     if (show && saleId) {
@@ -66,6 +69,23 @@ export default function SaleDetailsModal({ show, saleId, onClose }: SaleDetailsM
     }
     
     setLoading(false);
+  };
+
+  const handleCancelSale = async () => {
+    if (!saleId) return;
+
+    setCancelLoading(true);
+    const result = await cancelSale(saleId);
+
+    if (result.success) {
+      // Recargar los detalles para mostrar el estado actualizado
+      await loadSaleDetails();
+      setShowCancelConfirm(false);
+    } else {
+      alert(result.message || 'Error al cancelar la venta');
+    }
+
+    setCancelLoading(false);
   };
 
   return (
@@ -101,7 +121,7 @@ export default function SaleDetailsModal({ show, saleId, onClose }: SaleDetailsM
                 <Badge 
                   color={saleDetails.status === 'completed' ? 'success' : saleDetails.status === 'pending' ? 'warning' : 'failure'}
                 >
-                  {saleDetails.status}
+                  {saleDetails.status === 'completed' ? 'Completada' : saleDetails.status === 'pending' ? 'Pendiente' : 'Cancelada'}
                 </Badge>
               </div>
               <div>
@@ -199,6 +219,54 @@ export default function SaleDetailsModal({ show, saleId, onClose }: SaleDetailsM
               ) : (
                 <p className="text-gray-500 dark:text-gray-400">No hay productos en esta venta</p>
               )}
+            </div>
+
+            {/* Botón de Cancelar Venta */}
+            {saleDetails.status !== 'cancelled' && (
+              <div className="flex justify-end mt-6 pt-6 border-t dark:border-gray-700">
+                <Button
+                  color="failure"
+                  onClick={() => setShowCancelConfirm(true)}
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Cancelar Venta
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Modal de Confirmación de Cancelación */}
+        {showCancelConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md mx-4 text-center">
+              <div className="flex justify-center mb-4">
+                <div className="rounded-full bg-red-100 dark:bg-red-900/20 p-3">
+                  <AlertTriangle className="w-12 h-12 text-red-600 dark:text-red-500" />
+                </div>
+              </div>
+              <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                ¿Estás seguro que deseas cancelar esta venta?
+              </h3>
+              <p className="mb-5 text-sm text-gray-400 dark:text-gray-500">
+                Esta acción no se puede deshacer.
+              </p>
+              <div className="flex justify-center gap-4">
+                <Button
+                  color="failure"
+                  onClick={handleCancelSale}
+                  disabled={cancelLoading}
+                >
+                  {cancelLoading ? 'Cancelando...' : 'Sí, cancelar venta'}
+                </Button>
+                <Button
+                  color="gray"
+                  onClick={() => setShowCancelConfirm(false)}
+                  disabled={cancelLoading}
+                >
+                  No, volver
+                </Button>
+              </div>
             </div>
           </div>
         )}

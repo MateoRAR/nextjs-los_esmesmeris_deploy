@@ -4,8 +4,9 @@ import { revalidatePath } from "next/cache";
 import { apiFetch } from "../../lib/api";
 import { Product } from "../../types/product";
 
-export async function getProducts(): Promise<Product[]> {
-  return apiFetch<Product[]>("/products");
+export async function getProducts(name?: string): Promise<Product[]> {
+  const url = name ? `/products?name=${encodeURIComponent(name)}` : "/products";
+  return apiFetch<Product[]>(url);
 }
 
 export async function getProduct(id: string): Promise<Product> {

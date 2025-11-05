@@ -24,8 +24,6 @@ export default function LoginForm() {
   const { setRole, setId, setName, setIsAuthenticated } = useUserStore();
   
   useEffect(() => {// setea el estado 
-
-
     if (state?.success && state.user) {
       setRole(state.user.role)
       setId(state.user.id)
@@ -34,9 +32,6 @@ export default function LoginForm() {
       router.push('/home')
       
     }
-    
-
-
   }, [state])
 
 

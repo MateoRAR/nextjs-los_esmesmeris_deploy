@@ -1,5 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
 import {useState,useEffect} from "react"
+import DeleteUserModal from "components/users/deleteUserModal";
 export default function Component({users}) {
   // si users existe  entonces entonces accede a lo primero sino, array vacio
   const ignore=new Set(["createdAt","updatedAt"]);
@@ -17,6 +18,12 @@ export default function Component({users}) {
             <TableHeadCell>
               <span className="sr-only">Edit</span>
             </TableHeadCell>
+
+            <TableHeadCell>
+              <span className="sr-only">Delete</span>
+            </TableHeadCell>
+
+            
           </TableRow>
         </TableHead>
         <TableBody className="divide-y">
@@ -26,16 +33,23 @@ export default function Component({users}) {
 
          {keys.map((key) => (
 
-            <TableCell key={user+key}>{user[key]} </TableCell>
+            <TableCell key={user['id']+key}>{user[key]} </TableCell>
              
 
         ))}    
 
             <TableCell>
-              <a href="#" className="font-medium text-primary-600 hover:underline dark:text-primary-500">
+              <a href={"/users/"+user['id']} className="font-medium text-primary-600 hover:underline dark:text-primary-500">
                 Edit
               </a>
             </TableCell>
+
+            <TableCell>
+
+          <DeleteUserModal userId={user['id']}/>
+
+            </TableCell>
+          
           </TableRow>
         ))} 
 

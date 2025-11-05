@@ -18,14 +18,14 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  /*
+  
   // Si no tiene algun rol lo envia a public
   if (role !== 'public') {
     return NextResponse.redirect(homeUrl)
   }
   //si no tiene ningun rol lo envia a login
   return NextResponse.redirect(loginUrl)
-  */
+
 }
 
 export const config = {
